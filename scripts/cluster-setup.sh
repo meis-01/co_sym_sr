@@ -14,8 +14,12 @@ elif [[ "$CLUSTER_EXECUTION_MODE" == apptainer ]]; then
   [[ -n "${APPTAINER_IMAGE:-}" && -f "$APPTAINER_IMAGE" ]] || {
     echo "Set APPTAINER_IMAGE to an existing .sif file" >&2; exit 2;
   }
+elif [[ "$CLUSTER_EXECUTION_MODE" == micromamba ]]; then
+  # The environment is provisioned outside this repository.  Only verify it;
+  # never activate, install into, clear, or recreate the user's prefix.
+  cluster_prepare
 else
-  echo "CLUSTER_EXECUTION_MODE must be modules or apptainer" >&2
+  echo "CLUSTER_EXECUTION_MODE must be modules, micromamba, or apptainer" >&2
   exit 2
 fi
 echo "Cluster environment setup complete ($CLUSTER_EXECUTION_MODE)."

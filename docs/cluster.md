@@ -42,7 +42,42 @@ system site packages. It deliberately does not replace NumPy, SciPy, h5py, or
 Matplotlib with wheels. The setup and each job check key imports, but a site
 stack still needs the smoke simulation below.
 
-If the site does not provide uv as a module, install it in your user account on
+### Native Micromamba mode
+
+When a tested CFD environment already exists outside the checkout, use the
+Micromamba runner. It invokes the configured executable with `micromamba run`;
+it never activates, installs into, clears, or recreates the environment prefix.
+For the project-parent layout used by this project, the defaults resolve to
+`.tools/micromamba`, `.micromamba`, and `.cfd-env`:
+
+```bash
+CLUSTER_EXECUTION_MODE=micromamba
+PROJECT_ROOT="$HOME/2026_CO_SYM_SR/co_sym_sr"
+CLUSTER_PROJECT_PARENT="$HOME/2026_CO_SYM_SR"
+MICROMAMBA_EXE="$CLUSTER_PROJECT_PARENT/.tools/micromamba"
+MICROMAMBA_ROOT_PREFIX="$CLUSTER_PROJECT_PARENT/.micromamba"
+MICROMAMBA_ENV_PREFIX="$CLUSTER_PROJECT_PARENT/.cfd-env"
+MICROMAMBA_PYTHON=python
+```
+
+Put these settings in the ignored `scripts/cluster.env`, then run the read-only
+preflight. It checks the executable and both prefixes, imports `cardiac_flow`
+and the native CFD libraries, checks Git provenance, and sets `PYTHONPATH` plus
+one thread for common numerical runtimes:
+
+```bash
+cp scripts/cluster.env.example scripts/cluster.env
+${EDITOR:-vi} scripts/cluster.env
+bash scripts/cluster-setup.sh
+```
+
+The executable, root prefix, environment prefix, and Python command are all
+configurable in `cluster.env`; no shell initialization or home configuration
+is required. Git must be available on compute nodes because each case records
+its commit and working-tree state.
+
+For `CLUSTER_EXECUTION_MODE=modules`, if the site does not provide uv as a
+module, install it in your user account on
 a node with network access and make its bin directory available on login and
 compute nodes:
 
@@ -74,7 +109,8 @@ bash scripts/cluster-setup.sh
 
 The cluster must provide Apptainer and access to the image, project, run, and
 log paths. Native-module mode instead requires a usable `uv` command on login
-and compute nodes. No Conda or Poetry environment is used.
+and compute nodes. No Conda or Poetry workflow is introduced; Micromamba mode
+uses the pre-provisioned prefix described above.
 
 `environment-ubuntu24.04.lock.txt` records the project's existing WSL apt
 baseline; it is not a requirement for the cluster host. The Apptainer recipe
@@ -117,6 +153,19 @@ and its required numerical qualification. The generated
 manifest is kept under `MANIFEST_ROOT`, and `RUN_ROOT/<study>/<case-id>` holds
 each simulation independently.
 
+For the SR workflow, run the small pilot first and then the accuracy array:
+
+```bash
+SLURM_DRY_RUN=1 bash scripts/slurm/submit-array.sh sr_pilot
+bash scripts/slurm/submit-array.sh sr_pilot
+SLURM_DRY_RUN=1 bash scripts/slurm/submit-array.sh sr_accuracy
+bash scripts/slurm/submit-array.sh sr_accuracy
+```
+
+Only after the accuracy report supplies a qualification file should the full
+`sr_sweep` array be submitted. The scripts reject an unqualified production
+campaign and cap every allocation at eight CPUs (the default is one).
+
 Before submitting a full array, verify one generated case without running CFD:
 
 ```bash
@@ -157,6 +206,18 @@ Copy results and logs back to another machine with, for example:
 rsync -av cluster-user@cluster:/scratch/USER/cardiac-flow-runs/sweep/ ./results/sweep/
 rsync -av cluster-user@cluster:/scratch/USER/cardiac-flow-logs/ ./logs/
 ```
+
+Operator checklist for the next HPC connection:
+
+1. Check out `exp`, copy `scripts/cluster.env.example`, and set project, run,
+   log, and manifest paths.
+2. Select `micromamba` and verify the executable plus the existing root and
+   environment prefixes; do not run an environment creation command.
+3. Run `bash scripts/cluster-setup.sh` and the `sr_pilot` dry run.
+4. Submit `sr_pilot`, inspect `execution.json` and `validation.json`, then
+   submit `sr_accuracy`.
+5. Review convergence, conservation, inlet-flow, and equivariance metrics
+   before creating a qualification report for `sr_sweep`.
 
 ## Smoke test
 

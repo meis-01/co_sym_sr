@@ -11,8 +11,15 @@ fi
 # shellcheck source=/dev/null
 source "$CLUSTER_CONFIG"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$CLUSTER_SCRIPT_DIR/.." && pwd)}"
-RUN_ROOT="${RUN_ROOT:-$PROJECT_ROOT/cluster-runs}"
-LOG_ROOT="${LOG_ROOT:-$PROJECT_ROOT/cluster-logs}"
+CLUSTER_PROJECT_PARENT="${CLUSTER_PROJECT_PARENT:-$(cd "$PROJECT_ROOT/.." && pwd)}"
+CLUSTER_EXECUTION_MODE="${CLUSTER_EXECUTION_MODE:-modules}"
+if [[ "$CLUSTER_EXECUTION_MODE" == micromamba ]]; then
+  RUN_ROOT="${RUN_ROOT:-$CLUSTER_PROJECT_PARENT/cluster-runs}"
+  LOG_ROOT="${LOG_ROOT:-$CLUSTER_PROJECT_PARENT/cluster-logs}"
+else
+  RUN_ROOT="${RUN_ROOT:-$PROJECT_ROOT/cluster-runs}"
+  LOG_ROOT="${LOG_ROOT:-$PROJECT_ROOT/cluster-logs}"
+fi
 MANIFEST_ROOT="${MANIFEST_ROOT:-$RUN_ROOT/manifests}"
 SLURM_CPUS="${SLURM_CPUS:-1}"
 if [[ ! "$SLURM_CPUS" =~ ^[1-8]$ ]]; then
@@ -36,8 +43,11 @@ if [[ ! "$SLURM_ARRAY_CONCURRENCY" =~ ^[1-9][0-9]*$ ]]; then
   echo "SLURM_ARRAY_CONCURRENCY must be a positive integer." >&2
   exit 2
 fi
-CLUSTER_EXECUTION_MODE="${CLUSTER_EXECUTION_MODE:-modules}"
 CLUSTER_PYTHON="${CLUSTER_PYTHON:-python3}"
+MICROMAMBA_EXE="${MICROMAMBA_EXE:-$CLUSTER_PROJECT_PARENT/.tools/micromamba}"
+MICROMAMBA_ROOT_PREFIX="${MICROMAMBA_ROOT_PREFIX:-$CLUSTER_PROJECT_PARENT/.micromamba}"
+MICROMAMBA_ENV_PREFIX="${MICROMAMBA_ENV_PREFIX:-$CLUSTER_PROJECT_PARENT/.cfd-env}"
+MICROMAMBA_PYTHON="${MICROMAMBA_PYTHON:-python}"
 declare -p CLUSTER_MODULES >/dev/null 2>&1 || CLUSTER_MODULES=()
 
 cluster_load_modules() {
@@ -56,12 +66,36 @@ cluster_apptainer_args() {
   printf '%s\0' apptainer exec --bind "$bind_list" --pwd "$PROJECT_ROOT" "$APPTAINER_IMAGE" "$APPTAINER_PYTHON"
 }
 
+cluster_micromamba_args() {
+  # Use `run` instead of activation so batch jobs do not modify shell startup
+  # files or the installed environment.  NUL delimiters preserve paths safely.
+  printf '%s\0' "$MICROMAMBA_EXE" run --root-prefix "$MICROMAMBA_ROOT_PREFIX" \
+    --prefix "$MICROMAMBA_ENV_PREFIX" "$MICROMAMBA_PYTHON"
+}
+
 cluster_limit_threads() {
   # DOLFIN currently enforces a single MPI rank and the CFD path is serial.
   # Keep common native BLAS/OpenMP runtimes from silently oversubscribing it.
   export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
   export NUMEXPR_NUM_THREADS=1 BLIS_NUM_THREADS=1 GOTO_NUM_THREADS=1
   export VECLIB_MAXIMUM_THREADS=1 TBB_NUM_THREADS=1
+}
+
+cluster_verify_git() {
+  # Probe Git through the selected CFD Python so a host-only Git installation
+  # cannot mask a missing executable in the job environment.
+  if ! cluster_python -c 'import subprocess, sys
+repo = sys.argv[1]
+subprocess.run(["git", "--version"], check=True, stdout=subprocess.DEVNULL)
+subprocess.run(["git", "-C", repo, "rev-parse", "--verify", "HEAD"],
+               check=True, stdout=subprocess.DEVNULL)' "$PROJECT_ROOT"; then
+    echo "Git is unavailable in the selected CFD environment or cannot access: $PROJECT_ROOT" >&2
+    exit 2
+  fi
+}
+
+cluster_verify_imports() {
+  cluster_python -c 'import cardiac_flow, dolfin, gmsh, h5py, meshio, numpy, petsc4py, scipy; print("CFD imports ready", dolfin.__version__)'
 }
 
 cluster_prepare() {
@@ -78,7 +112,24 @@ cluster_prepare() {
         exit 2
       fi
       source "$PROJECT_ROOT/.venv/bin/activate"
-      uv run --no-sync python -c 'import dolfin, gmsh, h5py, meshio, numpy, petsc4py, scipy; print("CFD imports ready", dolfin.__version__)'
+      export PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+      cluster_verify_imports
+      cluster_verify_git
+      ;;
+    micromamba)
+      cluster_limit_threads
+      [[ -x "$MICROMAMBA_EXE" ]] || {
+        echo "Micromamba executable is not executable: $MICROMAMBA_EXE" >&2; exit 2;
+      }
+      [[ -d "$MICROMAMBA_ROOT_PREFIX" ]] || {
+        echo "Micromamba root prefix does not exist: $MICROMAMBA_ROOT_PREFIX" >&2; exit 2;
+      }
+      [[ -d "$MICROMAMBA_ENV_PREFIX" ]] || {
+        echo "Micromamba environment prefix does not exist: $MICROMAMBA_ENV_PREFIX" >&2; exit 2;
+      }
+      export PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+      cluster_verify_imports
+      cluster_verify_git
       ;;
     apptainer)
       cluster_limit_threads
@@ -91,10 +142,12 @@ cluster_prepare() {
       export APPTAINERENV_MKL_NUM_THREADS=1 APPTAINERENV_NUMEXPR_NUM_THREADS=1
       export APPTAINERENV_BLIS_NUM_THREADS=1 APPTAINERENV_GOTO_NUM_THREADS=1
       export APPTAINERENV_VECLIB_MAXIMUM_THREADS=1 APPTAINERENV_TBB_NUM_THREADS=1
+      export APPTAINERENV_PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
       mapfile -d '' -t check_command < <(cluster_apptainer_args)
-      "${check_command[@]}" -c 'import dolfin, gmsh, h5py, meshio, numpy, petsc4py, scipy; print("CFD imports ready", dolfin.__version__)'
+      "${check_command[@]}" -c 'import cardiac_flow, dolfin, gmsh, h5py, meshio, numpy, petsc4py, scipy; print("CFD imports ready", dolfin.__version__)'
+      cluster_verify_git
       ;;
-    *) echo "CLUSTER_EXECUTION_MODE must be modules or apptainer" >&2; exit 2 ;;
+    *) echo "CLUSTER_EXECUTION_MODE must be modules, micromamba, or apptainer" >&2; exit 2 ;;
   esac
 }
 
@@ -103,8 +156,14 @@ cluster_python() {
     # NUL-delimited arguments avoid shell re-parsing of user paths.
     mapfile -d '' -t command < <(cluster_apptainer_args)
     "${command[@]}" "$@"
-  else
+  elif [[ "$CLUSTER_EXECUTION_MODE" == micromamba ]]; then
+    mapfile -d '' -t command < <(cluster_micromamba_args)
+    "${command[@]}" "$@"
+  elif [[ "$CLUSTER_EXECUTION_MODE" == modules ]]; then
     uv run --no-sync python "$@"
+  else
+    echo "CLUSTER_EXECUTION_MODE must be modules, micromamba, or apptainer" >&2
+    return 2
   fi
 }
 
@@ -112,6 +171,7 @@ cluster_sbatch_options() {
   # SLURM executes a spool copy of the batch file; do not resolve code via $0.
   export CFD_PROJECT_ROOT="$PROJECT_ROOT"
   export CLUSTER_CONFIG="$(realpath "$CLUSTER_CONFIG")"
+  export CLUSTER_PROJECT_PARENT MICROMAMBA_EXE MICROMAMBA_ROOT_PREFIX MICROMAMBA_ENV_PREFIX MICROMAMBA_PYTHON
   SBATCH_OPTIONS=(--ntasks=1 "--cpus-per-task=$SLURM_CPUS" "--mem=$SLURM_MEMORY" "--time=$SLURM_TIME"
     "--chdir=$PROJECT_ROOT" --export=ALL)
   [[ -z "$SLURM_PARTITION" ]] || SBATCH_OPTIONS+=("--partition=$SLURM_PARTITION")
