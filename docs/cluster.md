@@ -111,7 +111,9 @@ bash scripts/slurm/submit-array.sh sweep
 
 The array range is `0..case_count-1`; its maximum simultaneous jobs comes from
 `SLURM_ARRAY_CONCURRENCY`. Logs are named with the array and task IDs. The
-available studies are `sweep`, `convergence`, and `rotation`. The generated
+available studies are `sweep`, `convergence`, `rotation`, `sr_pilot`, `sr_accuracy`,
+and `sr_sweep`. See [sr_campaign.md](sr_campaign.md) for the separate SR campaign
+and its required numerical qualification. The generated
 manifest is kept under `MANIFEST_ROOT`, and `RUN_ROOT/<study>/<case-id>` holds
 each simulation independently.
 

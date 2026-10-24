@@ -14,18 +14,23 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from cardiac_flow.model import load
 from cardiac_flow.compare import compare
+from cardiac_flow.sr_campaign import STUDIES, configurations
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('study', choices=['sweep', 'convergence', 'rotation'])
+    parser.add_argument('study', choices=['sweep', 'convergence', 'rotation', *STUDIES])
     parser.add_argument('--run', action='store_true')
+    parser.add_argument('--dry-run', action='store_true', help='inspect manifest cases without simulation')
+    parser.add_argument('--qualification', type=Path, help='passed SR accuracy qualification')
     parser.add_argument('--root', default='studies')
     args = parser.parse_args()
     root = Path(args.root)/args.study
     root.mkdir(parents=True, exist_ok=True)
     cases = {}
-    if args.study == 'sweep':
+    if args.study in STUDIES:
+        cases = configurations(args.study, args.qualification)
+    elif args.study == 'sweep':
         base = load('configs/expansion.json')
         for re, alpha, expansion, waveform, eccentricity, angle in itertools.product(
                 [60., 300.], [10., 18.], [0., .3], [0, 1], [0., .5], [0., 1.5707963267948966]):
@@ -55,10 +60,17 @@ def main():
     for name, config in cases.items():
         config_path = root/f'{name}.json'
         config_path.write_text(json.dumps(config, indent=2))
-        if args.run and not (root/name/'fields.h5').exists():
+        if args.run and not args.dry_run and args.study not in STUDIES and not (root/name/'fields.h5').exists():
             subprocess.run([sys.executable, '-m', 'cardiac_flow', 'run', str(config_path), str(root/name)],
                            check=True, env=dict(os.environ, OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1'))
-    if args.run and args.study in ('rotation', 'convergence'):
+    if args.study in STUDIES and (args.run or args.dry_run):
+        from scripts.experiments import build_manifest, run_case, REPO
+        path = root.parent / f'{args.study}.manifest.json'
+        manifest = build_manifest(args.study, None, path.resolve(), root.resolve(), REPO,
+                                  args.qualification)
+        for entry in manifest['cases']:
+            run_case(path, entry['index'], dry_run=args.dry_run)
+    if args.run and not args.dry_run and args.study in ('rotation', 'convergence'):
         if args.study == 'rotation':
             result = compare(root/'orientation_0/fields.h5', root/'orientation_90/fields.h5',
                              angle=1.5707963267948966)

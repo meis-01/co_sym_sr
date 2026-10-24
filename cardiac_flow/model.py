@@ -52,6 +52,14 @@ def dimensionless(c):
                 alpha=r*np.sqrt(2*np.pi*c['rho']/(c['period']*c['mu'])))
 
 
+def flow_parameters(reynolds, alpha, *, radius, rho, mu):
+    """Invert dimensionless() using diameter-based Re and radius-based alpha."""
+    if not all(np.isfinite(x) and x > 0 for x in (reynolds, alpha, radius, rho, mu)):
+        raise ValueError('dimensionless parameters and material properties must be positive')
+    return dict(mean_flow=float(reynolds*np.pi*radius*mu/(2*rho)),
+                period=float(2*np.pi*rho*radius**2/(mu*alpha**2)))
+
+
 def radius(z, c):
     return c['radius']*(1+c['expansion']*np.sin(np.pi*np.asarray(z)/c['length'])**2)
 

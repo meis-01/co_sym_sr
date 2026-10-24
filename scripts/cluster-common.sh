@@ -32,6 +32,10 @@ SLURM_TIME="${SLURM_TIME:-12:00:00}"
 SLURM_PARTITION="${SLURM_PARTITION:-}"
 SLURM_ACCOUNT="${SLURM_ACCOUNT:-}"
 SLURM_ARRAY_CONCURRENCY="${SLURM_ARRAY_CONCURRENCY:-4}"
+if [[ ! "$SLURM_ARRAY_CONCURRENCY" =~ ^[1-9][0-9]*$ ]]; then
+  echo "SLURM_ARRAY_CONCURRENCY must be a positive integer." >&2
+  exit 2
+fi
 CLUSTER_EXECUTION_MODE="${CLUSTER_EXECUTION_MODE:-modules}"
 CLUSTER_PYTHON="${CLUSTER_PYTHON:-python3}"
 declare -p CLUSTER_MODULES >/dev/null 2>&1 || CLUSTER_MODULES=()
@@ -45,7 +49,8 @@ cluster_load_modules() {
 }
 
 cluster_apptainer_args() {
-  local binds=("$PROJECT_ROOT:$PROJECT_ROOT" "$RUN_ROOT:$RUN_ROOT" "$LOG_ROOT:$LOG_ROOT")
+  local binds=("$PROJECT_ROOT:$PROJECT_ROOT" "$RUN_ROOT:$RUN_ROOT" "$LOG_ROOT:$LOG_ROOT"
+    "$MANIFEST_ROOT:$MANIFEST_ROOT")
   local bind_list
   bind_list="$(IFS=,; echo "${binds[*]}")"
   printf '%s\0' apptainer exec --bind "$bind_list" --pwd "$PROJECT_ROOT" "$APPTAINER_IMAGE" "$APPTAINER_PYTHON"
@@ -104,7 +109,11 @@ cluster_python() {
 }
 
 cluster_sbatch_options() {
-  SBATCH_OPTIONS=(--ntasks=1 "--cpus-per-task=$SLURM_CPUS" "--mem=$SLURM_MEMORY" "--time=$SLURM_TIME")
+  # SLURM executes a spool copy of the batch file; do not resolve code via $0.
+  export CFD_PROJECT_ROOT="$PROJECT_ROOT"
+  export CLUSTER_CONFIG="$(realpath "$CLUSTER_CONFIG")"
+  SBATCH_OPTIONS=(--ntasks=1 "--cpus-per-task=$SLURM_CPUS" "--mem=$SLURM_MEMORY" "--time=$SLURM_TIME"
+    "--chdir=$PROJECT_ROOT" --export=ALL)
   [[ -z "$SLURM_PARTITION" ]] || SBATCH_OPTIONS+=("--partition=$SLURM_PARTITION")
   [[ -z "$SLURM_ACCOUNT" ]] || SBATCH_OPTIONS+=("--account=$SLURM_ACCOUNT")
 }

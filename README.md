@@ -25,6 +25,11 @@ For uv-managed cluster environments and SLURM single jobs/arrays, see
 [docs/cluster.md](docs/cluster.md). The workflow supports compatible native
 modules and an optional Apptainer image while keeping each solver process serial.
 
+The separate 36-case `sr_sweep` design, preliminary pilot, numerical qualification
+and solver-independent SR export are documented in [docs/sr_campaign.md](docs/sr_campaign.md).
+Production execution requires passed refinement/rotation evidence; structural
+validation alone does not certify data accuracy.
+
 ## Run on Windows through WSL
 
 From Windows, open the Ubuntu WSL shell and run:

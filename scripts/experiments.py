@@ -17,6 +17,7 @@ import tempfile
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 from cardiac_flow.model import load  # noqa: E402
+from cardiac_flow.sr_campaign import STUDIES, load_qualification, verify_qualification, digest  # noqa: E402
 
 
 def sha256(data: bytes) -> str:
@@ -30,13 +31,18 @@ def git_info(repo: Path) -> dict:
 
 
 def build_manifest(study: str | None, config: Path | None, manifest_path: Path,
-                   output_root: Path, repo: Path) -> dict:
+                   output_root: Path, repo: Path, qualification: Path | None = None,
+                   single_output: Path | None = None) -> dict:
     if (study is None) == (config is None):
         raise ValueError("provide exactly one of --study or --config")
+    if single_output and (study or single_output.resolve().parent != output_root.resolve()):
+        raise ValueError('--single-output requires --config and its parent as --output-root')
     if study:
         with tempfile.TemporaryDirectory(prefix="cfd-manifest-") as temporary:
-            subprocess.run([sys.executable, str(REPO / "scripts" / "study.py"), study,
-                            "--root", temporary], cwd=repo, check=True)
+            command = [sys.executable, str(REPO / "scripts" / "study.py"), study, "--root", temporary]
+            if qualification:
+                command.extend(["--qualification", str(qualification.resolve())])
+            subprocess.run(command, cwd=repo, check=True)
             generated = Path(temporary) / study
             cases = [(p.stem, json.loads(p.read_text(encoding="utf-8")))
                      for p in sorted(generated.glob("*.json"))]
@@ -46,12 +52,29 @@ def build_manifest(study: str | None, config: Path | None, manifest_path: Path,
         cases = [(config.stem, json.loads(config.read_text(encoding="utf-8")))]
         kind = "single"
 
+    previous = json.loads(manifest_path.read_text(encoding='utf-8')) if manifest_path.exists() else None
+    if study in STUDIES and previous:
+        prior = {entry['id']: entry['parameters'] for entry in previous['cases']}
+        current = dict(cases)
+        upgrade = (study == 'sr_sweep' and qualification and not previous.get('accuracy_qualification')
+                   and prior.keys() == current.keys()
+                   and all({k: v for k, v in prior[name].items() if k != '_sr'} ==
+                           {k: v for k, v in c.items() if k != '_sr'} for name, c in cases)
+                   and all(not Path(e['output']).exists() or not any(Path(e['output']).iterdir())
+                           for e in previous['cases']))
+        if ((prior != current and not upgrade)
+                or previous['output_root'] != str(output_root.resolve())):
+            raise ValueError('SR manifest mapping is immutable; use a new manifest/run root for changed designs '
+                             'and supply the same qualification when previewing qualified runs')
+
     config_dir = manifest_path.parent / f"{manifest_path.stem}.configs"
     config_dir.mkdir(parents=True, exist_ok=True)
     entries = []
     for index, (case_id, parameters) in enumerate(cases):
         config_file = config_dir / f"{case_id}.json"
-        config_file.write_text(json.dumps(parameters, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        content = (json.dumps(parameters, indent=2, sort_keys=True) + '\n').encode('utf-8')
+        if not config_file.exists() or config_file.read_bytes() != content:
+            config_file.write_bytes(content)
         checked = load(config_file)
         config_bytes = config_file.read_bytes()
         entries.append({
@@ -59,7 +82,7 @@ def build_manifest(study: str | None, config: Path | None, manifest_path: Path,
             "id": case_id,
             "config": os.path.relpath(config_file, manifest_path.parent),
             "config_sha256": sha256(config_bytes),
-            "output": str((output_root / case_id).resolve()),
+            "output": str((single_output or output_root / case_id).resolve()),
             "parameters": checked,
         })
     result = {
@@ -70,6 +93,14 @@ def build_manifest(study: str | None, config: Path | None, manifest_path: Path,
         "output_root": str(output_root.resolve()),
         "cases": entries,
     }
+    if qualification:
+        if not all(c['parameters'].get('_sr', {}).get('study') == 'sr_sweep' for c in entries):
+            raise ValueError('qualification is only used with sr_sweep configurations')
+        result['accuracy_qualification'] = load_qualification(qualification)
+        result['accuracy_qualification_sha256'] = digest(qualification)
+    # Keep creation provenance, and avoid rewriting files referenced by queued jobs.
+    if previous and dict(result, git=previous['git']) == previous:
+        return previous
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return result
@@ -167,6 +198,8 @@ def run_case(manifest_path: Path, index: int, dry_run: bool = False) -> int:
     config = (manifest_path.resolve().parent / case["config"]).resolve()
     if sha256(config.read_bytes()) != case["config_sha256"]:
         raise ValueError(f"configuration changed since manifest creation: {config}")
+    if load(config) != case['parameters']:
+        raise ValueError('manifest parameters disagree with the copied configuration')
     output = Path(case["output"])
     status = case_status(output)
     if dry_run:
@@ -174,6 +207,15 @@ def run_case(manifest_path: Path, index: int, dry_run: bool = False) -> int:
                           "output": str(output), "status": status,
                           "parameters": case["parameters"]}, indent=2))
         return 0
+    if case['parameters'].get('_sr', {}).get('study') == 'sr_sweep':
+        qualification = manifest.get('accuracy_qualification')
+        if not qualification:
+            raise ValueError('sr_sweep execution requires a passed --qualification; draft dry runs are allowed')
+        verify_qualification(qualification)
+        if case['parameters']['_sr'].get('qualification_sha256') != manifest['accuracy_qualification_sha256']:
+            raise ValueError('configuration does not belong to this accuracy qualification')
+        if any(case['parameters'].get(k) != v for k, v in qualification['selected_numerics'].items()):
+            raise ValueError('configuration does not use the qualified numerical settings')
     if status == "completed":
         previous = output / "execution.json"
         if previous.is_file():
@@ -215,13 +257,26 @@ def run_case(manifest_path: Path, index: int, dry_run: bool = False) -> int:
             "config_sha256": case["config_sha256"], "git": git_info(repo),
             "environment": execution_environment(), "parameters": case["parameters"],
         }
+        limits = {name: '1' for name in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS',
+                  'NUMEXPR_NUM_THREADS', 'BLIS_NUM_THREADS', 'GOTO_NUM_THREADS',
+                  'VECLIB_MAXIMUM_THREADS', 'TBB_NUM_THREADS')}
+        child_environment = dict(os.environ, **limits, **{f'APPTAINERENV_{k}': v for k, v in limits.items()})
+        metadata['environment']['thread_limits'] = limits
+        log_dir = Path(manifest['output_root']) / '.logs' / case['id']
+        log_dir.mkdir(parents=True, exist_ok=True)
+        attempt = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')
+        stdout_path, stderr_path = log_dir / f'{attempt}.out', log_dir / f'{attempt}.err'
+        metadata['logs'] = {'stdout': str(stdout_path), 'stderr': str(stderr_path)}
         metadata_path = output / "execution.json"
         running_path = lock_dir / f"{case['id']}.running.json"
         running_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         try:
-            subprocess.run(run_command(repo, output, "run", str(config), str(output)), cwd=repo, check=True)
-            subprocess.run(run_command(repo, output, "validate", str(output / "fields.h5")),
-                           cwd=repo, check=True)
+            print(f"[{case['id']}] stdout: {stdout_path}; stderr: {stderr_path}", flush=True)
+            with stdout_path.open('w') as stdout, stderr_path.open('w') as stderr:
+                subprocess.run(run_command(repo, output, "run", str(config), str(output)), cwd=repo,
+                               check=True, stdout=stdout, stderr=stderr, env=child_environment)
+                subprocess.run(run_command(repo, output, "validate", str(output / "fields.h5")),
+                               cwd=repo, check=True, stdout=stdout, stderr=stderr, env=child_environment)
             validation = json.loads((output / "validation.json").read_text(encoding="utf-8"))
             if validation.get("status") != "passed":
                 raise RuntimeError(f"validator returned unexpected status: {validation}")
@@ -236,6 +291,9 @@ def run_case(manifest_path: Path, index: int, dry_run: bool = False) -> int:
             metadata["status"] = "failed"
             metadata["finished_utc"] = datetime.now(timezone.utc).isoformat()
             metadata["error"] = str(error)
+            if stderr_path.exists():
+                lines = stderr_path.read_text(encoding='utf-8', errors='replace').splitlines()
+                metadata['stderr_excerpt'] = '\n'.join(lines[:25] + (['...'] + lines[-25:] if len(lines) > 25 else []))
             metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             failure_path = output / "failure.json"
             if not failure_path.exists():
@@ -263,11 +321,13 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     create = sub.add_parser("manifest", help="create a deterministic study or single-case manifest")
     source = create.add_mutually_exclusive_group(required=True)
-    source.add_argument("--study", choices=("sweep", "convergence", "rotation"))
+    source.add_argument("--study", choices=("sweep", "convergence", "rotation", *STUDIES))
     source.add_argument("--config", type=Path)
     create.add_argument("--manifest", required=True, type=Path)
     create.add_argument("--output-root", required=True, type=Path)
     create.add_argument("--repo", type=Path, default=REPO)
+    create.add_argument("--qualification", type=Path)
+    create.add_argument("--single-output", type=Path, help='explicit output directory for --config')
     case_parser = sub.add_parser("case", help="execute one manifest case")
     case_parser.add_argument("--manifest", required=True, type=Path)
     case_parser.add_argument("--index", required=True, type=int)
@@ -277,7 +337,7 @@ def main() -> None:
     args = parser.parse_args()
     if args.command == "manifest":
         manifest = build_manifest(args.study, args.config, args.manifest.resolve(),
-                                  args.output_root, args.repo.resolve())
+                                  args.output_root, args.repo.resolve(), args.qualification, args.single_output)
         print(f"Wrote {len(manifest['cases'])} cases to {args.manifest}")
     elif args.command == "case":
         raise SystemExit(run_case(args.manifest, args.index, args.dry_run))

@@ -5,7 +5,7 @@
 #SBATCH --output=cardiac-cfd-%j.out
 #SBATCH --error=cardiac-cfd-%j.err
 set -euo pipefail
-source "$(dirname "$0")/../cluster-common.sh"
+source "${CFD_PROJECT_ROOT:-${SLURM_SUBMIT_DIR:-$PWD}}/scripts/cluster-common.sh"
 cluster_prepare
 manifest="${1:?usage: run-case.sbatch MANIFEST.json CASE_INDEX}"
 index="${2:-${SLURM_ARRAY_TASK_ID:-}}"
