@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cardiac-flow-synthetic"
+version = "0.1.0"
+description = "3D pulsatile CFD generation and solver-independent HDF5 access"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy==1.26.4",
+    "scipy==1.11.4",
+    "h5py==3.10.0",
+    "matplotlib==3.6.3",
+    "meshio==5.3.5",
+]
+
+[dependency-groups]
+dev = ["pytest>=7,<9"]
+
+[tool.uv]
+package = false
+
+[tool.setuptools.packages.find]
+include = ["cardiac_flow*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

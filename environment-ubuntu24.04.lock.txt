@@ -1,0 +1,13 @@
+Executed environment: Ubuntu 24.04.4 LTS, WSL, Python 3.12.3, x86_64
+Package versions observed 2026-10-24; apt availability may change.
+
+libdolfin2019.2gcc13t64:amd64 2019.2.0~legacy20240219.1c52e83-1ubuntu4
+libpetsc-real3.19t64:amd64 3.19.6+dfsg1-2.2ubuntu2
+python3-dolfin 2019.2.0~legacy20240219.1c52e83-1ubuntu4
+python3-dolfin-real 2019.2.0~legacy20240219.1c52e83-1ubuntu4
+python3-gmsh 4.12.1+ds1-1.1build2
+python3-h5py 3.10.0-1ubuntu3
+python3-matplotlib 3.6.3-1ubuntu5
+python3-meshio 7.0.0-really-5.3.5-1
+python3-numpy 1:1.26.4+ds-6ubuntu1
+python3-scipy 1.11.4-6build1

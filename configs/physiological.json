@@ -1,0 +1,9 @@
+{
+  "geometry": "expansion", "radius": 0.012, "length": 0.12,
+  "expansion": 0.3, "mesh_size": 0.002,
+  "rho": 1060.0, "mu": 0.0035, "period": 0.8,
+  "mean_flow": 0.00008, "harmonics": [[0.8, 0.0], [0.3, -0.5]],
+  "inlet": "parabolic", "eccentricity": 0.5, "orientation": 0.0,
+  "steps_per_cycle": 800, "min_cycles": 5, "max_cycles": 40,
+  "periodic_tolerance": 0.001, "initial": "zero", "benchmark": false
+}
