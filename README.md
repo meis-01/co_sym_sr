@@ -21,6 +21,10 @@ libraries safely. `environment-ubuntu24.04.lock.txt` records that OS layer.
 See [RESULTS.md](RESULTS.md) for executed runs and measured errors.
 Configuration-only sweep cases are not counted as simulations.
 
+For uv-managed cluster environments and SLURM single jobs/arrays, see
+[docs/cluster.md](docs/cluster.md). The workflow supports compatible native
+modules and an optional Apptainer image while keeping each solver process serial.
+
 ## Run on Windows through WSL
 
 From Windows, open the Ubuntu WSL shell and run:

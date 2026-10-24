@@ -1,0 +1,21 @@
+{
+  "geometry": "straight",
+  "radius": 0.012,
+  "length": 0.06,
+  "expansion": 0.0,
+  "mesh_size": 0.01,
+  "rho": 1060.0,
+  "mu": 0.0035,
+  "period": 0.8,
+  "mean_flow": 0.000002,
+  "harmonics": [],
+  "inlet": "parabolic",
+  "eccentricity": 0.0,
+  "orientation": 0.0,
+  "steps_per_cycle": 50,
+  "min_cycles": 2,
+  "max_cycles": 5,
+  "periodic_tolerance": 0.05,
+  "initial": "zero",
+  "benchmark": false
+}

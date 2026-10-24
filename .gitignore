@@ -5,5 +5,10 @@ __pycache__/
 build/
 dist/
 .venv/
+scripts/cluster.env
+cluster-runs/
+cluster-logs/
+cardiac-flow-runs/
+cardiac-flow-logs/
 results/*
 studies/*

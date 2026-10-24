@@ -1,0 +1,28 @@
+Bootstrap: docker
+From: ubuntu:24.04
+
+%files
+    pyproject.toml /opt/cardiac-flow/pyproject.toml
+    uv.lock /opt/cardiac-flow/uv.lock
+
+%post
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates curl git python3-dolfin python3-gmsh python3-meshio \
+        python3-h5py python3-scipy python3-matplotlib
+    rm -rf /var/lib/apt/lists/*
+    curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
+    uv venv --python /usr/bin/python3 --system-site-packages /opt/venv
+    UV_PROJECT_ENVIRONMENT=/opt/venv uv sync --project /opt/cardiac-flow --locked \
+        --no-install-package numpy --no-install-package scipy --no-install-package h5py \
+        --no-install-package matplotlib
+
+%environment
+    export PATH=/opt/venv/bin:/usr/local/bin:/usr/bin:/bin
+    export VIRTUAL_ENV=/opt/venv
+
+%labels
+    Author OpenAI
+    Project cardiac-flow-synthetic
+    CFDBackend legacy-FEniCS-DOLFIN-2019.2
+
