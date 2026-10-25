@@ -136,6 +136,18 @@ Each step solves the full coupled Oseen problem with Picard iteration, using
 PETSc MUMPS direct LU on one CPU process. Picard stops at relative velocity
 L2 update <1e-7, or the run fails after 20 iterations. No turbulence model,
 pressure projection, or artificial compressibility is used. Viscosity is implicit.
+MUMPS remains the default when `linear_solver` is omitted (or set to `"mumps"`).
+Set `"linear_solver": "fieldsplit"` to opt into the experimental serial PETSc
+FGMRES solver: velocity/pressure FieldSplit, full Schur factorization, `selfp`
+Schur approximation, velocity ILU(0), and pressure MUMPS LU. It uses relative
+tolerance `1e-14`, zero absolute tolerance, restart 100, and at most 300 iterations.
+Each solve checks PETSc convergence and the true relative residual (`<=1e-12`);
+failure stops the run without an automatic fallback. The equations, boundary
+conditions, and nonlinear criteria are identical. Reports record the selected
+solver, its options, iteration/residual statistics, and cumulative solver time.
+See [the five-cycle comparison](docs/linear_solver_five_cycles.md) for the tested
+scope and recommendation. Reproduce only the 184-cell comparison with
+`.venv/bin/python scripts/validate_linear_solvers.py studies/new_linear_comparison`.
 An optional consistent grad-div term, `grad_div_ratio * mu * div(u)*div(v)`,
 reduces strong divergence while retaining the mixed continuity constraint.
 `expansion_stabilized.json` uses a finer 6 mm mesh and ratio 1000 to demonstrate

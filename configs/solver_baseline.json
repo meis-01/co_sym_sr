@@ -1,0 +1,23 @@
+{
+  "geometry": "straight",
+  "expansion": 0.0,
+  "radius": 0.012,
+  "length": 0.06,
+  "rho": 1060.0,
+  "mu": 0.0035,
+  "harmonics": [[0.5, 0.0], [0.15, -0.5]],
+  "inlet": "parabolic",
+  "eccentricity": 0,
+  "orientation": 0.0,
+  "initial": "zero",
+  "benchmark": false,
+  "mesh_size": 0.01,
+  "steps_per_cycle": 100,
+  "min_cycles": 5,
+  "max_cycles": 5,
+  "periodic_tolerance": 0.0005,
+  "grad_div_ratio": 0.0,
+  "outlet_pressure": 0.0,
+  "mean_flow": 3.7343459844557917e-06,
+  "period": 1.902907550174389
+}

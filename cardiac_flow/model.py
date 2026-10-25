@@ -7,6 +7,8 @@ from scipy.special import jv
 
 def load(path):
     c = json.loads(Path(path).read_text())
+    if c.get('linear_solver', 'mumps') not in ('mumps', 'fieldsplit'):
+        raise ValueError('linear_solver must be mumps or fieldsplit')
     for key in ('radius', 'length', 'mesh_size', 'rho', 'mu', 'period', 'mean_flow'):
         if not np.isfinite(c[key]) or c[key] <= 0:
             raise ValueError(f'{key} must be finite and positive')

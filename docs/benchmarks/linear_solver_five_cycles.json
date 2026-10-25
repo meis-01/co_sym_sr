@@ -1,0 +1,896 @@
+{
+  "schema": "cardiac-flow-five-cycle-linear-comparison-1",
+  "created_utc": "2026-10-25T06:33:57.520131+00:00",
+  "environment": {
+    "python": "3.12.3",
+    "petsc": [
+      3,
+      19,
+      6
+    ],
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "cpu": "Intel(R) Core(TM) Ultra 7 258V",
+    "threads": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "comparison": {
+    "numerically_equivalent": true,
+    "field_errors": {
+      "velocity": {
+        "relative_space_time_l2": 1.2182134992445002e-11,
+        "max_phase_relative_l2": 1.9043694978932417e-11,
+        "phase_relative_l2": [
+          6.7884166937870436e-12,
+          6.452160797529317e-12,
+          6.195381119956617e-12,
+          6.6542088632893794e-12,
+          6.820020586624043e-12,
+          7.510388377592974e-12,
+          8.393885274717053e-12,
+          9.64063759613782e-12,
+          1.0196624608662994e-11,
+          1.0701857053235415e-11,
+          1.0897377584058167e-11,
+          1.8223134537994014e-11,
+          1.604380158154298e-11,
+          1.7525184605410364e-11,
+          1.9043694978932417e-11,
+          1.7692724377445513e-11,
+          1.6325336482272992e-11,
+          1.69026956685287e-11,
+          1.8381898514619583e-11,
+          1.5247261034589544e-11,
+          1.5986370021520544e-11,
+          1.899641322089288e-11,
+          1.789174503546533e-11,
+          1.6423141820817387e-11,
+          7.792806115284549e-12
+        ],
+        "max_absolute_nodal_difference": 6.931781537655723e-13
+      },
+      "pressure": {
+        "relative_space_time_l2": 1.2387552659373738e-10,
+        "max_phase_relative_l2": 5.475048907968246e-09,
+        "phase_relative_l2": [
+          6.852010431655744e-11,
+          2.846725608647646e-09,
+          3.1548998713464617e-10,
+          7.368650691000749e-11,
+          7.521390336889796e-11,
+          8.365945832770026e-11,
+          2.839211390752749e-12,
+          1.2834181485858553e-10,
+          2.6178195304920638e-11,
+          4.89559955300427e-11,
+          5.475048907968246e-09,
+          1.1501720866643052e-09,
+          1.9394255546247998e-10,
+          1.1859154162275224e-10,
+          3.069900664763356e-10,
+          1.643128722335408e-10,
+          3.19363316464799e-10,
+          1.9390145426682003e-10,
+          1.9941246085685445e-11,
+          2.0615897977691326e-10,
+          1.326441290960566e-11,
+          1.045357467178151e-10,
+          6.444969825119304e-11,
+          2.5063080015480904e-11,
+          1.953798349119549e-10
+        ],
+        "max_absolute_nodal_difference": 3.0984984022985884e-10
+      }
+    },
+    "max_time_step_diagnostic_differences": {
+      "inlet_flow": 1.5246593050577406e-20,
+      "outlet_flow": 7.118973108493493e-17,
+      "flux_error": 1.9059424270849034e-11,
+      "divergence_scaled": 2.8525626305508922e-11,
+      "inlet_flow_error": 4.08006961549745e-15,
+      "wall_rms": 6.936800062169794e-18,
+      "max_speed": 1.5767248617848395e-13,
+      "inlet_flow_scaled": 4.0828014099500475e-15,
+      "outlet_flow_scaled": 1.9063507072258985e-11
+    },
+    "max_cycle_periodicity_differences": {
+      "velocity": 1.7206791547152989e-12,
+      "pressure": 1.4062917497170702e-11
+    },
+    "identical_picard_iteration_counts": true
+  },
+  "runs": {
+    "mumps": {
+      "total_seconds": 54.669819590999396,
+      "report": {
+        "status": "periodic_converged",
+        "cycles": 5,
+        "periodic_velocity": 0.00038695323320879043,
+        "periodic_pressure": 3.9016372358362575e-05,
+        "dimensionless": {
+          "Re": 59.999999999999986,
+          "alpha": 12.0
+        },
+        "vertices": 83,
+        "cells": 184,
+        "mixed_dofs": 1364,
+        "wall_seconds": 49.144834995269775,
+        "setup_and_simulation_seconds": 54.178830485005165,
+        "cycle_history": [
+          {
+            "cycle": 1,
+            "periodic_velocity": null,
+            "periodic_pressure": null
+          },
+          {
+            "cycle": 2,
+            "periodic_velocity": 0.33180137565032547,
+            "periodic_pressure": 0.13705489965932996
+          },
+          {
+            "cycle": 3,
+            "periodic_velocity": 0.02952981304209927,
+            "periodic_pressure": 0.004792590640823206
+          },
+          {
+            "cycle": 4,
+            "periodic_velocity": 0.002982722877790042,
+            "periodic_pressure": 0.000647197787739765
+          },
+          {
+            "cycle": 5,
+            "periodic_velocity": 0.00038695323320879043,
+            "periodic_pressure": 3.9016372358362575e-05
+          }
+        ],
+        "dolfin": "2019.2.0.13.dev0",
+        "python": "3.12.3",
+        "max_flux_error": 1.8145784044222437e-15,
+        "max_inlet_flow_error": 0.10442356134724,
+        "max_wall_rms": 6.936800062169794e-18,
+        "max_divergence_scaled": 1.0992788741424777,
+        "final_cycle_max_divergence_scaled": 0.4730160019106964,
+        "phases": [
+          {
+            "time": 7.611630200697555,
+            "inlet_flow": 5.7054743857999764e-06,
+            "outlet_flow": 5.705474385799974e-06,
+            "inlet_flow_error": 0.10379973625924165,
+            "flux_error": 6.804669016583413e-16,
+            "divergence_scaled": 0.4730160019106964,
+            "wall_rms": 4.128356479330383e-19,
+            "max_speed": 0.026866934185667338,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.687746502704531,
+            "inlet_flow": 5.714753673642113e-06,
+            "outlet_flow": 5.7147536736421135e-06,
+            "inlet_flow_error": 0.10396855440924284,
+            "flux_error": 2.2682230055278046e-16,
+            "divergence_scaled": 0.44944566314095796,
+            "wall_rms": 6.61298162544841e-19,
+            "max_speed": 0.026910630116783078,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.763862804711507,
+            "inlet_flow": 5.487868637777599e-06,
+            "outlet_flow": 5.4878686377776e-06,
+            "inlet_flow_error": 0.09984083333095387,
+            "flux_error": 2.2682230055278046e-16,
+            "divergence_scaled": 0.4060875650301733,
+            "wall_rms": 5.869822740951257e-19,
+            "max_speed": 0.02584223423694951,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.8399791067184825,
+            "inlet_flow": 5.051172715145833e-06,
+            "outlet_flow": 5.051172715145832e-06,
+            "inlet_flow_error": 0.09189602129087507,
+            "flux_error": 2.2682230055278046e-16,
+            "divergence_scaled": 0.3601842094181326,
+            "wall_rms": 3.0069513734126446e-19,
+            "max_speed": 0.023785844212362295,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.916095408725457,
+            "inlet_flow": 4.465157013269692e-06,
+            "outlet_flow": 4.4651570132696935e-06,
+            "inlet_flow_error": 0.08123463344030539,
+            "flux_error": 4.536446011055609e-16,
+            "divergence_scaled": 0.33209542148054294,
+            "wall_rms": 8.311158130761361e-19,
+            "max_speed": 0.0224992493386782,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.992211710732433,
+            "inlet_flow": 3.8124728338445058e-06,
+            "outlet_flow": 3.812472833844507e-06,
+            "inlet_flow_error": 0.06936034550141937,
+            "flux_error": 3.4023345082917064e-16,
+            "divergence_scaled": 0.3308703855374619,
+            "wall_rms": 2.414658778860996e-19,
+            "max_speed": 0.02088330245649791,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.068328012739409,
+            "inlet_flow": 3.181400712217187e-06,
+            "outlet_flow": 3.1814007122171883e-06,
+            "inlet_flow_error": 0.05787924588444314,
+            "flux_error": 3.4023345082917064e-16,
+            "divergence_scaled": 0.3451562915371862,
+            "wall_rms": 1.8684456127442052e-19,
+            "max_speed": 0.020061480550480036,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.144444314746384,
+            "inlet_flow": 2.6486094631898087e-06,
+            "outlet_flow": 2.6486094631898117e-06,
+            "inlet_flow_error": 0.04818617088476995,
+            "flux_error": 7.938780519347315e-16,
+            "divergence_scaled": 0.35570349853103767,
+            "wall_rms": 2.64719864882977e-19,
+            "max_speed": 0.020399346524476572,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.22056061675336,
+            "inlet_flow": 2.2651814760421476e-06,
+            "outlet_flow": 2.2651814760421505e-06,
+            "inlet_flow_error": 0.04121046277548541,
+            "flux_error": 7.938780519347315e-16,
+            "divergence_scaled": 0.34998492330336506,
+            "wall_rms": 2.390254270909815e-19,
+            "max_speed": 0.020457043120479277,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.296676918760335,
+            "inlet_flow": 2.0490477398479264e-06,
+            "outlet_flow": 2.049047739847929e-06,
+            "inlet_flow_error": 0.03727834016890259,
+            "flux_error": 6.804669016583413e-16,
+            "divergence_scaled": 0.3254512457124553,
+            "wall_rms": 4.664488082872474e-19,
+            "max_speed": 0.020277946573745195,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.372793220767312,
+            "inlet_flow": 1.9853853724246155e-06,
+            "outlet_flow": 1.9853853724246167e-06,
+            "inlet_flow_error": 0.03612013026358315,
+            "flux_error": 3.4023345082917064e-16,
+            "divergence_scaled": 0.28729618960333425,
+            "wall_rms": 1.6597325685294276e-19,
+            "max_speed": 0.01992358724688493,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.448909522774287,
+            "inlet_flow": 2.034575608257097e-06,
+            "outlet_flow": 2.0345756082570986e-06,
+            "inlet_flow_error": 0.03701504857548537,
+            "flux_error": 4.536446011055609e-16,
+            "divergence_scaled": 0.24500300887985788,
+            "wall_rms": 1.6000601767659005e-19,
+            "max_speed": 0.019456073129065662,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.525025824781263,
+            "inlet_flow": 2.1454839258826194e-06,
+            "outlet_flow": 2.1454839258826207e-06,
+            "inlet_flow_error": 0.03903280439034636,
+            "flux_error": 3.4023345082917064e-16,
+            "divergence_scaled": 0.20839470015340758,
+            "wall_rms": 2.6329684008795714e-19,
+            "max_speed": 0.018927432521494616,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.601142126788238,
+            "inlet_flow": 2.270558391907814e-06,
+            "outlet_flow": 2.270558391907816e-06,
+            "inlet_flow_error": 0.04130828504424076,
+            "flux_error": 4.536446011055609e-16,
+            "divergence_scaled": 0.18345158351713192,
+            "wall_rms": 2.1431969637826636e-19,
+            "max_speed": 0.0183757748854805,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.677258428795213,
+            "inlet_flow": 2.378857254443884e-06,
+            "outlet_flow": 2.378857254443884e-06,
+            "inlet_flow_error": 0.04327856702401757,
+            "flux_error": 0.0,
+            "divergence_scaled": 0.17003505020194867,
+            "wall_rms": 1.674745860935664e-19,
+            "max_speed": 0.01782570844221321,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.75337473080219,
+            "inlet_flow": 2.4637035191393792e-06,
+            "outlet_flow": 2.4637035191393797e-06,
+            "inlet_flow_error": 0.04482217572374226,
+            "flux_error": 1.1341115027639023e-16,
+            "divergence_scaled": 0.1643728186280517,
+            "wall_rms": 2.496710085081359e-19,
+            "max_speed": 0.01729067230452744,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.829491032809164,
+            "inlet_flow": 2.5430728679658363e-06,
+            "outlet_flow": 2.543072867965837e-06,
+            "inlet_flow_error": 0.046266142853934926,
+            "flux_error": 2.2682230055278046e-16,
+            "divergence_scaled": 0.16374169099446018,
+            "wall_rms": 1.78179574244348e-19,
+            "max_speed": 0.0167763859275088,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.90560733481614,
+            "inlet_flow": 2.65269836908588e-06,
+            "outlet_flow": 2.652698369085881e-06,
+            "inlet_flow_error": 0.04826056037894772,
+            "flux_error": 2.2682230055278046e-16,
+            "divergence_scaled": 0.1687378511088959,
+            "wall_rms": 3.2522781618355644e-19,
+            "max_speed": 0.016285364018883693,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.981723636823116,
+            "inlet_flow": 2.833751619080024e-06,
+            "outlet_flow": 2.833751619080026e-06,
+            "inlet_flow_error": 0.051554463449486755,
+            "flux_error": 4.536446011055609e-16,
+            "divergence_scaled": 0.18327986099926336,
+            "wall_rms": 2.0043856847419984e-19,
+            "max_speed": 0.016174025856079913,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.05783993883009,
+            "inlet_flow": 3.118366435102097e-06,
+            "outlet_flow": 3.1183664351020967e-06,
+            "inlet_flow_error": 0.05673246283058819,
+            "flux_error": 1.1341115027639023e-16,
+            "divergence_scaled": 0.21273415677647972,
+            "wall_rms": 1.8155742494192545e-19,
+            "max_speed": 0.016295674528491778,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.133956240837067,
+            "inlet_flow": 3.5168559617389045e-06,
+            "outlet_flow": 3.5168559617389045e-06,
+            "inlet_flow_error": 0.06398218563539604,
+            "flux_error": 0.0,
+            "divergence_scaled": 0.2594286090957642,
+            "wall_rms": 4.750997050190111e-19,
+            "max_speed": 0.0167440141997821,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.210072542844042,
+            "inlet_flow": 4.010089210865162e-06,
+            "outlet_flow": 4.010089210865161e-06,
+            "inlet_flow_error": 0.07295558166027448,
+            "flux_error": 4.536446011055609e-16,
+            "divergence_scaled": 0.31913988576220825,
+            "wall_rms": 2.6186692189483267e-19,
+            "max_speed": 0.018883408393719863,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.286188844851019,
+            "inlet_flow": 4.54923167701148e-06,
+            "outlet_flow": 4.549231677011479e-06,
+            "inlet_flow_error": 0.08276420439836876,
+            "flux_error": 2.2682230055278046e-16,
+            "divergence_scaled": 0.3819520918415568,
+            "wall_rms": 6.744567066693364e-19,
+            "max_speed": 0.02142221659356082,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.362305146857993,
+            "inlet_flow": 5.06322787077157e-06,
+            "outlet_flow": 5.063227870771567e-06,
+            "inlet_flow_error": 0.09211534082329277,
+            "flux_error": 6.804669016583413e-16,
+            "divergence_scaled": 0.4354699309386693,
+            "wall_rms": 2.6860377122243884e-19,
+            "max_speed": 0.023842611634471964,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.438421448864968,
+            "inlet_flow": 5.472463630283789e-06,
+            "outlet_flow": 5.472463630283789e-06,
+            "inlet_flow_error": 0.09956056991956974,
+            "flux_error": 0.0,
+            "divergence_scaled": 0.4682456277632285,
+            "wall_rms": 4.6565175235348e-19,
+            "max_speed": 0.025769692447348985,
+            "picard_iterations": 0
+          }
+        ],
+        "numerics": {
+          "method": "P2/P1 Taylor-Hood; backward Euler; Picard",
+          "dt": 0.01902907550174389,
+          "linear_solver": "PETSc MUMPS LU",
+          "linear_solver_key": "mumps",
+          "linear_solver_experimental": false,
+          "nonlinear_tolerance": 1e-07,
+          "max_nonlinear_iterations": 20,
+          "quadrature_degree": 6,
+          "outlet": "mu grad(u)n - p n + rho/2 max(-u_adv.n,0)u = -p_out n",
+          "outlet_pressure_Pa": 0.0,
+          "pressure_reference": "outlet pseudo-traction at configured constant gauge pressure",
+          "spatial_accuracy": "piecewise planar tetrahedra; quadratic velocity; linear pressure",
+          "temporal_accuracy": "first order",
+          "grad_div_ratio": 0.0
+        },
+        "linear_solver_statistics": {
+          "solves": 1995,
+          "linear_system_seconds": 44.819429886876605,
+          "solver_seconds": 22.00000000000035,
+          "solver_timer": "DOLFIN LU solver wall timer: factorization/solve",
+          "assembly_seconds": null
+        },
+        "source_sha256": {
+          "analysis.py": "93443b4a425bdeca348ed98f9d4ded31fdc9050bd276aa5d1e375c2d7394e8da",
+          "compare.py": "4129fbb781679c6e563a7bf8b1214b31f5bd1de8744f4141a8a2e12673635b9a",
+          "mesh.py": "ab748c1db22a9f9f2f75bc1e10559f4804cee254d08827cf9a7b65c5357f3f86",
+          "model.py": "3f60b655474769ccdb64acb14a1ea94a16186ae2a549af65cf61b768ef1f0328",
+          "reference.py": "7b8b2366844b0552876570bfc74dff4c138438cf6c62025c6b440feaf444c212",
+          "solver.py": "3a0b439303f9193c96dce50cdb6261f2967886a8d2eb9af40d8a4986490b0bbb",
+          "sr_accuracy.py": "7d5a8ea28819bdebef44cc633fb5ee70a15bc8f57617aaec513f0117641abd52",
+          "sr_campaign.py": "7f819f61978a355351d3bd904ee1d60308e355f0010de59b3e0ebd3093b95b85",
+          "sr_data.py": "9d1ee3a33d0daca742cbc8deee03e33ee7aef89f0c9abc2b39bdea7fd0550d99",
+          "storage.py": "6120f0bfec562c4ae92971705bc3772b066368500536f25da62d4d01ae9b31a7",
+          "__init__.py": "ad75f11eff5b13c045d03fa0c76a82660192c6e41ef3cf8518385c1ed52164ee",
+          "__main__.py": "de4367d860d527225ea200fea86d68ada77ae642df8dc2a2cbdee091ba5315e1"
+        }
+      },
+      "validation": {
+        "status": "passed",
+        "phases": 25,
+        "wall_vertex_max": 2.6680999197959012e-17,
+        "wall_p2_node_max": 2.6680999197959012e-17,
+        "exported_flux_error": 9.072892022111218e-16,
+        "max_fe_divergence_scaled": 1.0992788741424777,
+        "periodic_velocity": 0.00038695323320879043,
+        "periodic_pressure": 3.9016372358362575e-05,
+        "final_cycle_max_divergence_scaled": 0.4730160019106964,
+        "local_divergence_below_0_1": false,
+        "exported_derivatives_verified": true,
+        "accuracy_certified": false,
+        "requested_inlet_flow_error_scaled": 0.10396855440924421
+      }
+    },
+    "fieldsplit": {
+      "total_seconds": 49.855392698002106,
+      "report": {
+        "status": "periodic_converged",
+        "cycles": 5,
+        "periodic_velocity": 0.00038695323318734253,
+        "periodic_pressure": 3.901638502552323e-05,
+        "dimensionless": {
+          "Re": 59.999999999999986,
+          "alpha": 12.0
+        },
+        "vertices": 83,
+        "cells": 184,
+        "mixed_dofs": 1364,
+        "wall_seconds": 46.808390855789185,
+        "setup_and_simulation_seconds": 49.369013443996664,
+        "cycle_history": [
+          {
+            "cycle": 1,
+            "periodic_velocity": null,
+            "periodic_pressure": null
+          },
+          {
+            "cycle": 2,
+            "periodic_velocity": 0.3318013756486048,
+            "periodic_pressure": 0.13705489964526704
+          },
+          {
+            "cycle": 3,
+            "periodic_velocity": 0.029529813041964992,
+            "periodic_pressure": 0.004792590643784437
+          },
+          {
+            "cycle": 4,
+            "periodic_velocity": 0.00298272287778061,
+            "periodic_pressure": 0.0006471977955640758
+          },
+          {
+            "cycle": 5,
+            "periodic_velocity": 0.00038695323318734253,
+            "periodic_pressure": 3.901638502552323e-05
+          }
+        ],
+        "dolfin": "2019.2.0.13.dev0",
+        "python": "3.12.3",
+        "max_flux_error": 1.9061238849253456e-11,
+        "max_inlet_flow_error": 0.10442356134724318,
+        "max_wall_rms": 0.0,
+        "max_divergence_scaled": 1.0992788741349748,
+        "final_cycle_max_divergence_scaled": 0.47301600190422366,
+        "phases": [
+          {
+            "time": 7.611630200697555,
+            "inlet_flow": 5.705474385799979e-06,
+            "outlet_flow": 5.705474385797613e-06,
+            "inlet_flow_error": 0.10379973625924097,
+            "flux_error": 6.335146854439157e-13,
+            "divergence_scaled": 0.47301600190422366,
+            "wall_rms": 0.0,
+            "max_speed": 0.02686693418566735,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.687746502704531,
+            "inlet_flow": 5.714753673642113e-06,
+            "outlet_flow": 5.714753673637416e-06,
+            "inlet_flow_error": 0.10396855440924284,
+            "flux_error": 1.2577296565651675e-12,
+            "divergence_scaled": 0.44944566313580403,
+            "wall_rms": 0.0,
+            "max_speed": 0.026910630116783088,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.763862804711507,
+            "inlet_flow": 5.487868637777598e-06,
+            "outlet_flow": 5.4878686377750776e-06,
+            "inlet_flow_error": 0.09984083333095409,
+            "flux_error": 6.750231664450745e-13,
+            "divergence_scaled": 0.4060875650277551,
+            "wall_rms": 0.0,
+            "max_speed": 0.025842234236949507,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.8399791067184825,
+            "inlet_flow": 5.051172715145833e-06,
+            "outlet_flow": 5.051172715139514e-06,
+            "inlet_flow_error": 0.09189602129087507,
+            "flux_error": 1.692094362123742e-12,
+            "divergence_scaled": 0.3601842094166032,
+            "wall_rms": 0.0,
+            "max_speed": 0.02378584421236229,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.916095408725457,
+            "inlet_flow": 4.4651570132696875e-06,
+            "outlet_flow": 4.465157013268062e-06,
+            "inlet_flow_error": 0.08123463344030653,
+            "flux_error": 4.3527199476078564e-13,
+            "divergence_scaled": 0.3320954214802429,
+            "wall_rms": 0.0,
+            "max_speed": 0.022499249338624117,
+            "picard_iterations": 0
+          },
+          {
+            "time": 7.992211710732433,
+            "inlet_flow": 3.8124728338445058e-06,
+            "outlet_flow": 3.8124728338438955e-06,
+            "inlet_flow_error": 0.06936034550141937,
+            "flux_error": 1.634254675482783e-13,
+            "divergence_scaled": 0.33087038553703463,
+            "wall_rms": 0.0,
+            "max_speed": 0.020883302456460705,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.068328012739409,
+            "inlet_flow": 3.181400712217186e-06,
+            "outlet_flow": 3.181400712217662e-06,
+            "inlet_flow_error": 0.05787924588444348,
+            "flux_error": 1.2747413291066262e-13,
+            "divergence_scaled": 0.3451562915362948,
+            "wall_rms": 0.0,
+            "max_speed": 0.020061480550344426,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.144444314746384,
+            "inlet_flow": 2.6486094631898125e-06,
+            "outlet_flow": 2.648609463185117e-06,
+            "inlet_flow_error": 0.04818617088476893,
+            "flux_error": 1.2573894231143384e-12,
+            "divergence_scaled": 0.35570349853079763,
+            "wall_rms": 0.0,
+            "max_speed": 0.020399346524337742,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.22056061675336,
+            "inlet_flow": 2.2651814760421493e-06,
+            "outlet_flow": 2.265181476041829e-06,
+            "inlet_flow_error": 0.04121046277548496,
+            "flux_error": 8.5738829608951e-14,
+            "divergence_scaled": 0.34998492330242487,
+            "wall_rms": 0.0,
+            "max_speed": 0.020457043120337758,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.296676918760335,
+            "inlet_flow": 2.0490477398479273e-06,
+            "outlet_flow": 2.049047739850495e-06,
+            "inlet_flow_error": 0.03727834016890237,
+            "flux_error": 6.876118041257539e-13,
+            "divergence_scaled": 0.3254512457109541,
+            "wall_rms": 0.0,
+            "max_speed": 0.02027794657360442,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.372793220767312,
+            "inlet_flow": 1.9853853724246138e-06,
+            "outlet_flow": 1.985385372429137e-06,
+            "inlet_flow_error": 0.03612013026358361,
+            "flux_error": 1.2112310849518476e-12,
+            "divergence_scaled": 0.2872961896014357,
+            "wall_rms": 0.0,
+            "max_speed": 0.019923587246747355,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.448909522774287,
+            "inlet_flow": 2.0345756082570957e-06,
+            "outlet_flow": 2.0345756082621766e-06,
+            "inlet_flow_error": 0.03701504857548571,
+            "flux_error": 1.3605935698658535e-12,
+            "divergence_scaled": 0.24500300887260634,
+            "wall_rms": 0.0,
+            "max_speed": 0.01945607312890799,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.525025824781263,
+            "inlet_flow": 2.145483925882621e-06,
+            "outlet_flow": 2.1454839258842334e-06,
+            "inlet_flow_error": 0.039032804390345906,
+            "flux_error": 4.3175624910221755e-13,
+            "divergence_scaled": 0.20839470014798625,
+            "wall_rms": 0.0,
+            "max_speed": 0.018927432521359963,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.601142126788238,
+            "inlet_flow": 2.2705583919078125e-06,
+            "outlet_flow": 2.270558391913477e-06,
+            "inlet_flow_error": 0.04130828504424121,
+            "flux_error": 1.5168741349467192e-12,
+            "divergence_scaled": 0.18345158351251253,
+            "wall_rms": 0.0,
+            "max_speed": 0.01837577488536355,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.677258428795213,
+            "inlet_flow": 2.378857254443881e-06,
+            "outlet_flow": 2.3788572544531816e-06,
+            "inlet_flow_error": 0.04327856702401837,
+            "flux_error": 2.490508860069529e-12,
+            "divergence_scaled": 0.1700350501984719,
+            "wall_rms": 0.0,
+            "max_speed": 0.017825708442113702,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.75337473080219,
+            "inlet_flow": 2.4637035191393754e-06,
+            "outlet_flow": 2.463703519145516e-06,
+            "inlet_flow_error": 0.04482217572374328,
+            "flux_error": 1.6443482678573818e-12,
+            "divergence_scaled": 0.1643728186260449,
+            "wall_rms": 0.0,
+            "max_speed": 0.017290672304450118,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.829491032809164,
+            "inlet_flow": 2.5430728679658393e-06,
+            "outlet_flow": 2.543072867968331e-06,
+            "inlet_flow_error": 0.046266142853934135,
+            "flux_error": 6.671977970760036e-13,
+            "divergence_scaled": 0.16374169099344554,
+            "wall_rms": 0.0,
+            "max_speed": 0.01677638592745312,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.90560733481614,
+            "inlet_flow": 2.6526983690858785e-06,
+            "outlet_flow": 2.6526983690896914e-06,
+            "inlet_flow_error": 0.04826056037894817,
+            "flux_error": 1.0210405859383412e-12,
+            "divergence_scaled": 0.16873785110867304,
+            "wall_rms": 0.0,
+            "max_speed": 0.016285364018844485,
+            "picard_iterations": 0
+          },
+          {
+            "time": 8.981723636823116,
+            "inlet_flow": 2.8337516190800237e-06,
+            "outlet_flow": 2.8337516190882073e-06,
+            "inlet_flow_error": 0.05155446344948687,
+            "flux_error": 2.1914436567906882e-12,
+            "divergence_scaled": 0.18327986100007776,
+            "wall_rms": 0.0,
+            "max_speed": 0.01617402585618162,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.05783993883009,
+            "inlet_flow": 3.1183664351020988e-06,
+            "outlet_flow": 3.118366435102552e-06,
+            "inlet_flow_error": 0.05673246283058774,
+            "flux_error": 1.2134993079573753e-13,
+            "divergence_scaled": 0.21273415677692326,
+            "wall_rms": 0.0,
+            "max_speed": 0.016295674528597013,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.133956240837067,
+            "inlet_flow": 3.516855961738904e-06,
+            "outlet_flow": 3.5168559617435484e-06,
+            "inlet_flow_error": 0.06398218563539616,
+            "flux_error": 1.243666673930895e-12,
+            "divergence_scaled": 0.259428609097247,
+            "wall_rms": 0.0,
+            "max_speed": 0.016744014199833998,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.210072542844042,
+            "inlet_flow": 4.0100892108651565e-06,
+            "outlet_flow": 4.010089210881722e-06,
+            "inlet_flow_error": 0.07295558166027608,
+            "flux_error": 4.4359637319107274e-12,
+            "divergence_scaled": 0.3191398857665634,
+            "wall_rms": 0.0,
+            "max_speed": 0.01888340839371984,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.286188844851019,
+            "inlet_flow": 4.5492316770114765e-06,
+            "outlet_flow": 4.5492316770267e-06,
+            "inlet_flow_error": 0.08276420439836968,
+            "flux_error": 4.0766772078351226e-12,
+            "divergence_scaled": 0.3819520918460986,
+            "wall_rms": 0.0,
+            "max_speed": 0.021422216593560806,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.362305146857993,
+            "inlet_flow": 5.063227870771574e-06,
+            "outlet_flow": 5.063227870782711e-06,
+            "inlet_flow_error": 0.09211534082329163,
+            "flux_error": 2.982259607667957e-12,
+            "divergence_scaled": 0.43546993094200925,
+            "wall_rms": 0.0,
+            "max_speed": 0.02384261163447199,
+            "picard_iterations": 0
+          },
+          {
+            "time": 9.438421448864968,
+            "inlet_flow": 5.472463630283788e-06,
+            "outlet_flow": 5.472463630285435e-06,
+            "inlet_flow_error": 0.09956056991956996,
+            "flux_error": 4.4094255227460516e-13,
+            "divergence_scaled": 0.468245627755864,
+            "wall_rms": 0.0,
+            "max_speed": 0.02576969244734898,
+            "picard_iterations": 0
+          }
+        ],
+        "numerics": {
+          "method": "P2/P1 Taylor-Hood; backward Euler; Picard",
+          "dt": 0.01902907550174389,
+          "linear_solver": "PETSc FGMRES FieldSplit Schur full/selfp; velocity ILU(0); pressure MUMPS LU",
+          "linear_solver_key": "fieldsplit",
+          "linear_solver_experimental": true,
+          "nonlinear_tolerance": 1e-07,
+          "max_nonlinear_iterations": 20,
+          "quadrature_degree": 6,
+          "outlet": "mu grad(u)n - p n + rho/2 max(-u_adv.n,0)u = -p_out n",
+          "outlet_pressure_Pa": 0.0,
+          "pressure_reference": "outlet pseudo-traction at configured constant gauge pressure",
+          "spatial_accuracy": "piecewise planar tetrahedra; quadratic velocity; linear pressure",
+          "temporal_accuracy": "first order",
+          "grad_div_ratio": 0.0,
+          "linear_solver_options": {
+            "ksp_type": "fgmres",
+            "ksp_pc_side": "right",
+            "ksp_gmres_restart": 100,
+            "pc_type": "fieldsplit",
+            "pc_fieldsplit_type": "schur",
+            "pc_fieldsplit_schur_fact_type": "full",
+            "pc_fieldsplit_schur_precondition": "selfp",
+            "fieldsplit_u_ksp_type": "preonly",
+            "fieldsplit_u_pc_type": "ilu",
+            "fieldsplit_u_pc_factor_levels": 0,
+            "fieldsplit_p_ksp_type": "preonly",
+            "fieldsplit_p_pc_type": "lu",
+            "fieldsplit_p_pc_factor_mat_solver_type": "mumps",
+            "ksp_rtol": 1e-14,
+            "ksp_atol": 0.0,
+            "ksp_divtol": 100000000.0,
+            "ksp_max_it": 300,
+            "ksp_norm_type": "unpreconditioned",
+            "true_relative_residual_limit": 1e-12
+          }
+        },
+        "linear_solver_statistics": {
+          "solves": 1995,
+          "linear_system_seconds": 40.25947177101625,
+          "solver_seconds": 16.072499876187067,
+          "solver_timer": "perf_counter: KSP creation/setup/factorization/solve",
+          "assembly_seconds": 23.166054669993173,
+          "total_iterations": 42774,
+          "max_iterations": 22,
+          "max_true_relative_residual": 1.0099802655175085e-14
+        },
+        "source_sha256": {
+          "analysis.py": "93443b4a425bdeca348ed98f9d4ded31fdc9050bd276aa5d1e375c2d7394e8da",
+          "compare.py": "4129fbb781679c6e563a7bf8b1214b31f5bd1de8744f4141a8a2e12673635b9a",
+          "mesh.py": "ab748c1db22a9f9f2f75bc1e10559f4804cee254d08827cf9a7b65c5357f3f86",
+          "model.py": "3f60b655474769ccdb64acb14a1ea94a16186ae2a549af65cf61b768ef1f0328",
+          "reference.py": "7b8b2366844b0552876570bfc74dff4c138438cf6c62025c6b440feaf444c212",
+          "solver.py": "3a0b439303f9193c96dce50cdb6261f2967886a8d2eb9af40d8a4986490b0bbb",
+          "sr_accuracy.py": "7d5a8ea28819bdebef44cc633fb5ee70a15bc8f57617aaec513f0117641abd52",
+          "sr_campaign.py": "7f819f61978a355351d3bd904ee1d60308e355f0010de59b3e0ebd3093b95b85",
+          "sr_data.py": "9d1ee3a33d0daca742cbc8deee03e33ee7aef89f0c9abc2b39bdea7fd0550d99",
+          "storage.py": "6120f0bfec562c4ae92971705bc3772b066368500536f25da62d4d01ae9b31a7",
+          "__init__.py": "ad75f11eff5b13c045d03fa0c76a82660192c6e41ef3cf8518385c1ed52164ee",
+          "__main__.py": "de4367d860d527225ea200fea86d68ada77ae642df8dc2a2cbdee091ba5315e1"
+        }
+      },
+      "validation": {
+        "status": "passed",
+        "phases": 25,
+        "wall_vertex_max": 2.668099919784924e-17,
+        "wall_p2_node_max": 2.668099919784924e-17,
+        "exported_flux_error": 4.43619055421128e-12,
+        "max_fe_divergence_scaled": 1.0992788741349748,
+        "periodic_velocity": 0.00038695323318734253,
+        "periodic_pressure": 3.901638502552323e-05,
+        "final_cycle_max_divergence_scaled": 0.47301600190422366,
+        "local_divergence_below_0_1": false,
+        "exported_derivatives_verified": true,
+        "accuracy_certified": false,
+        "requested_inlet_flow_error_scaled": 0.10396855440924398
+      }
+    }
+  },
+  "source_sha256": {
+    "scripts/validate_linear_solvers.py": "abbe79bb80c47055736595a070455b2f0f1d749853b7d1b530383d984b75b8a6",
+    "configs/solver_baseline.json": "1b285ab2705dcb34331dd17a0ef7ad9ed9e39daa8aefc1df238d7f9b6812a8d3"
+  }
+}
