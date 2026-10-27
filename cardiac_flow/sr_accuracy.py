@@ -16,7 +16,7 @@ from .compare import evaluate
 from .storage import EDGES, read
 from .sr_data import sample_mesh, file_hash
 from .sr_campaign import (SPEC_PATH, configurations, specification, group_id,
-                          solver_signature, assessment_signature, load_qualification)
+                          solver_signature, assessment_signature, load_qualification, production_numerics)
 
 
 def write_report(path, report):
@@ -227,8 +227,7 @@ def assess(manifest_path, output):
         velocity_ok = pressure_ok = False
     result.update(status='passed' if velocity_ok else 'failed', pressure_qualified=bool(velocity_ok and pressure_ok))
     if velocity_ok:
-        result['selected_numerics'] = dict(mesh_size=s['mesh_sizes'][-1], steps_per_cycle=s['steps_per_cycle'][-1],
-                                           periodic_tolerance=s['periodic_tolerance'])
+        result['selected_numerics'] = production_numerics()
     return write_report(output, result)
 
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
-import fcntl
 import hashlib
 import importlib.metadata
 import json
@@ -228,6 +227,7 @@ def run_case(manifest_path: Path, index: int, dry_run: bool = False) -> int:
         print(f"[{case['id']}] already validated; skipping {output}", flush=True)
         return 0
 
+    import fcntl  # Linux execution only; manifest generation/status also work on Windows.
     lock_dir = Path(manifest["output_root"]) / ".locks"
     lock_dir.mkdir(parents=True, exist_ok=True)
     lock_file = (lock_dir / f"{case['id']}.lock").open("a+")

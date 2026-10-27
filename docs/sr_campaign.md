@@ -1,5 +1,9 @@
 # CFD data for future symbolic regression
 
+For the automated qualification-to-export submission chain, see
+[One-session SR campaign](sr_workflow.md). The manual commands below remain
+available for inspection and targeted recovery.
+
 All work uses `exp`, the existing serial Navier–Stokes solver, and uv. No SR
 algorithm is included. Generating a manifest does not execute CFD. The current
 mesh/time settings are **candidates**, not a selected production resolution.
@@ -12,6 +16,13 @@ the compatible native environment. Use `uv run --no-sync` for this environment.
 ## Design and splits
 
 `configs/sr_campaign.json` is the versioned design and acceptance policy.
+All SR qualification, pilot, and sweep configurations explicitly use the existing
+PETSc FieldSplit solver with `grad_div_ratio=10`. MUMPS remains the general solver
+default for configurations outside this campaign. The qualification records the
+complete production numerical profile; a sweep cannot override it. Refinement
+and tighter-periodicity experiments retain their deliberate mesh/time/tolerance
+differences. Physics, campaign combinations, and acceptance thresholds are unchanged.
+Earlier qualification reports are stale after this profile change.
 `scripts/study.py sr_sweep` generates the Cartesian product:
 
 | Re | alpha | eccentricity | configurations |
@@ -94,8 +105,8 @@ sacct -j JOB_ID --format=JobID,State,ExitCode,Elapsed,AllocCPUS,MaxRSS
 * Separate 45° and 90° eccentric runs at medium/fine mesh for both the middle and
   high-Re/high-alpha eccentric representatives (eight additional runs).
 
-Once the pilot has established suitable wall time and memory, run qualification
-separately from the production sweep:
+Once suitable wall time and memory have been established, use the automated
+workflow linked above. For manual qualification only:
 
 ```bash
 SLURM_DRY_RUN=1 bash scripts/slurm/submit-array.sh sr_accuracy

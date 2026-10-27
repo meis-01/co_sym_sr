@@ -57,11 +57,19 @@ def load_qualification(path):
     return q
 
 
+def production_numerics():
+    s = specification()
+    return dict(mesh_size=s['mesh_sizes'][-1], steps_per_cycle=s['steps_per_cycle'][-1],
+                periodic_tolerance=s['periodic_tolerance'], linear_solver=s['linear_solver'],
+                grad_div_ratio=s['grad_div_ratio'], min_cycles=s['min_cycles'], max_cycles=s['max_cycles'])
+
+
 def verify_qualification(q):
     if (q.get('schema') != 'cardiac-flow-sr-qualification-1' or q.get('status') != 'passed'
             or q.get('campaign_sha256') != digest(SPEC_PATH)
             or q.get('solver_signature') != solver_signature()
-            or q.get('assessment_signature') != assessment_signature()):
+            or q.get('assessment_signature') != assessment_signature()
+            or q.get('selected_numerics') != production_numerics()):
         raise ValueError('qualification is missing, failed, stale, or belongs to another solver/campaign')
 
 
@@ -81,7 +89,7 @@ def configurations(study, qualification=None):
                  mesh_size=s['mesh_sizes'][h], steps_per_cycle=s['steps_per_cycle'][t],
                  min_cycles=6 if tight else s['min_cycles'], max_cycles=s['max_cycles'],
                  periodic_tolerance=s['tight_periodic_tolerance'] if tight else s['periodic_tolerance'],
-                 grad_div_ratio=0., outlet_pressure=0.)
+                 linear_solver=s['linear_solver'], grad_div_ratio=s['grad_div_ratio'], outlet_pressure=0.)
         c.update(flow_parameters(re, alpha, radius=c['radius'], rho=c['rho'], mu=c['mu']))
         c['_sr'] = dict(study=study, configuration_group=group_id(*parameters),
                         campaign_sha256=digest(SPEC_PATH), reynolds=re, alpha=alpha,

@@ -1,5 +1,7 @@
 {
   "schema": "cardiac-flow-sr-campaign-1",
+  "linear_solver": "fieldsplit",
+  "grad_div_ratio": 10.0,
   "radius": 0.012,
   "length": 0.06,
   "rho": 1060.0,
